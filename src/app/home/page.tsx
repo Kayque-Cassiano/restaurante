@@ -1,38 +1,30 @@
-import { Image, ScrollView, Text, Touchable, TouchableOpacity, View } from 'react-native'
+import { Image, ImageSourcePropType, ScrollView, Text, Touchable, TouchableOpacity, View } from 'react-native'
 import { styles } from "./style"
 import { Link } from 'expo-router'
+import { useEffect, useState } from 'react'
+
+type ProdutcType = {
+    id: number,
+    name: String,
+    description: String,
+    price: number,
+    imgUrl: ImageSourcePropType,
+    ingredients: String,
+}
 
 export default function Index() {
-    const MENU = [
-        {
-            id: 1,
-            name: "Space Burguer Classic",
-            description: "Pão brioche dourado, hambúrguer de carne suculenta, queijo cheddar derretido, picles crocantes, cebola caramelizada e molho especial.",
-            price: 27.00,
-            image: require("@/assets/images/original.png")
-        },
 
-        {
+    const [produtos, setProdutos] = useState<ProdutcType[]>()
 
-            id: 2,
-            name: "Chicken Galaxy",
-            description: "Pão macio e brilhante, hambúrguer de frango crocante, queijo derretido, alface fresca e molho especial de estrelas!",
-            price: 22.00,
-            image: require("@/assets/images/original.png")
+    function fetchProducts() {
+        fetch("http://localhost:8080/produto/")
+        .then((res) => res.json())
+        .then(data => setProdutos(data))
+    }
 
-        },
-
-        {
-
-            id: 3,
-            name: "Nebula Burger",
-            description: "Pão preto brilhante, hambúrguer de carne, queijo azul, cebola roxa, rúcula e molho de nebulosa",
-            price: 34.90,
-            image: require("@/assets/images/original.png")
-
-        },
-
-    ]
+    useEffect(() => {
+        fetchProducts()
+    }, [])
 
     return (
 
@@ -48,22 +40,22 @@ export default function Index() {
                 
                 <View style={styles.tabs}>
                     {["Combos", "Lanches", "Bebidas", "Sobremesas"].map((tab) => (
-                        <TouchableOpacity>
+                        <TouchableOpacity key={tab}>
                             <Text style={styles.tabText} >{tab}</Text>
                         </TouchableOpacity>
                     ))}
                 </View>
 
                 {
-                    MENU.map((item) => (
-                        <Link href={"/produto/1"} asChild>
+                    produtos?.map((item) => (
+                        <Link href={"/produto/1"} asChild key={item.id}>
                             <TouchableOpacity style={styles.menuItem}>
                                 <View style={styles.menuContent}>
                                     <Text style={styles.itemName}>{item.name}</Text>
                                     <Text>{item.description}</Text>
                                     <Text style={styles.itemPrice}>{item.price.toFixed(2)}</Text>
                                 </View>
-                                <Image source={item.image} style={styles.itemImage} />
+                                <Image source={item.imgUrl} style={styles.itemImage} />
 
                             </TouchableOpacity>
                         </Link>
